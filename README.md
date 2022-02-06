@@ -8,6 +8,13 @@
     * [What is a Git Repository?](#what-is-a-git-repository)
     * [Git's "Assembly Line"](#gits-assembly-line)
 2. [Getting Started](#getting-started)
+    * [Setting Up The Git Repository](#setting-up-the-git-repository)
+    * [Working Up The Tree](#working-up-the-tree)
+    * [The Staging Area](#the-staging-area)
+    * [The Local Repository](#the-local-repository)
+    * [Creating the Online Github Repository](#creating-the-online-github-repository)
+    * [Linking Local Repository With Github Repository](#linking-local-repository-with-github-repository)
+    * [Pushing Code To GitHub](#now-lets-push-our-code)
 3. Branching
 4. Topic 4
 5. References
@@ -92,7 +99,8 @@ def two_sum(arr, target):
     for index, num in enumerate(arr):
         curr_complement = target - num
         if curr_complement in sum_dict:
-            return [sum_dict[curr_complement], index]
+            complement_index = sum_dict[curr_complement]
+            return [complement_index, index]
         sum_dict[num] = index
     return [-1, -1] # Not found
 ```
@@ -146,27 +154,36 @@ For the next step, remember your username or navigate to your user profile.
 
 ## Creating the Online Github Repository
 
-Now, navigate to the user profile via the link `github.com/{your-username}`
+Now, navigate to the your user profile via the link `github.com/{your-username}`
+or anywhere on Github.
 
-To create a GitHub repository, do the following:
+### To create a GitHub repository, do the following:
 1) Go to the '+' button on the top right hand corner
 2) Click on 'New repository'
 3) Now, the name nor description of the repository matter: make them what you please.
-    a) I will using "git-test" and "git-test-description" for my name and description.
-4) Add a README.md
-5) Click 'Create repository'
+    > NOTE: only the GitHub Repository name is required, so if anything make a name.
+    * I will using "git-test" and "git-test-description" for my name and description.
+4) __Don't ADD anything__ 
+    * Adding a README.md, .gitignore, or any other file beforehand will add commits to this online repository, leading to __unrelated histories__ (i.e. you can't merge/push your current code to this new repository)
+5) Click __Create repository__
 6) You should be redirected to a new page at `github.com/{username}/{git-repo-name}`
+    * This page should be a quick set-up guide, providing some steps to pushing code to the Git repo.
+7) Copy the link to the Github repository's Git Repository by clicking the icon shown below in the quick set-up guide.
 
-Here's a quick GIF showcasing everything:
-![Git Repo GIF](images/creating-git-repo.gif)
+![Git Copy Link](images/git-copy-link.png)
+
+<h3 align="center">Here's a quick GIF showcasing everything:</h3>
+
+![Git Repo GIF](images/git-create-repo.gif)
 
 Great! All is left is to link the online Github repository with your current local repository on your computer.
 
 ## Linking Local Repository With Github Repository
 
-To link our local repository with the current online Github repository we just created, do the following command:
+To link our local repository with the current online Github repository we just created, do the following commands:
 
-    git remote add origin https://github.com/linschris/git-test.git
+    git remote add origin {copied_git_link}
+    git branch -M main
 
 Upon doing so, if you type in `git remote -v`, you should get:
 
@@ -174,19 +191,68 @@ Upon doing so, if you type in `git remote -v`, you should get:
 
 ## Now, let's push our code!
 
+To finally push our code from our local repository to the Github repository, do the following command:
 
-# TODO: BELOW (After Initalizing Git Repo with Github ...)
+    git push -u origin main
+
+### Upon reloading the quick setup page we were just at, the page should now contain the files you added:
+
+![Git Push](images/git-push.png)
+
+Congrats! We've now created our own GitHub repository!
 
 
 > Note: The commands shown below will make more sense, given the knowledge of [Git's 4 data stores](#gits-assembly-line).
 
-All commands will normally be prepending with word `git`.
-
-
-
 # Branching
 
+### Suppose you had a friend working on the same project `git-test` as you, but he's still working on implementing a new feature `three_sum.py`.
+
+```python
+
+    def three_sum(arr, target):
+        left = 0
+        right = 0
+        # Not sure how to solve just yet..
+
+```
+
+He still wants to save his progress, but he doesn't want to push his code and ruin any code you've curated.
+
+While yes he could just save everything on his local machine, what if he wants to work on this feature from a different computer somewhere else?
+
+This is the (or my inital) idea behind branching...
+
+## Commit Graph
+
+
+## Switching To A New Branch
+
+To create and move into a new branch, type in the following command:
+
+    git checkout -b {new_branch_name}
+> NOTE: if the branch is already made, simply omit the -b to only move into the branch.
+
+Ex: `git checkout -b three_sum`
+
+    Switched to a new branch 'three_sum'
+
+### Now, we're in a new branch! Note that the adding and committing are all the same.
+
+Using the knowledge from [before](#working-up-the-tree), make changes to the file two_sum.py:
+
+```python
+def three_sum(arr, target):
+    left = 0
+    right = 0
+    arr.sort()
+    # Not sure what to do just yet...
+```
+
+
 # Merging/Rebasing
+
+
 
 # References
 Special thanks to these videos/articles
