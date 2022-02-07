@@ -15,9 +15,12 @@
     * [Creating the Online Github Repository](#creating-the-online-github-repository)
     * [Linking Local Repository With Github Repository](#linking-local-repository-with-github-repository)
     * [Pushing Code To GitHub](#now-lets-push-our-code)
-3. Branching
-4. Topic 4
-5. References
+3. [Branching](#branching)
+    * [Commit Graph](#commit-graph-1)
+    * [Switching To A New Branch](#commit-graph-1)
+4. [Merging/Rebasing](#mergingrebasing)
+    * [Fixing Merge Conflicts](#fixing-merge-conflicts)
+5. [References](#references)
 
 
 # Introduction
@@ -209,7 +212,6 @@ Congrats! We've now created our own GitHub repository!
 ### Suppose you had a friend working on the same project `git-test` as you, but he's still working on implementing a new feature `three_sum.py`.
 
 ```python
-
     def three_sum(arr, target):
         left = 0
         right = 0
@@ -226,6 +228,8 @@ This is the (or my inital) idea behind branching...
 ## Commit Graph
 
 
+
+
 ## Switching To A New Branch
 
 To create and move into a new branch, type in the following command:
@@ -239,9 +243,11 @@ Ex: `git checkout -b three_sum`
 
 ### Now, we're in a new branch! Note that the adding and committing are all the same.
 
-Using the knowledge from [before](#working-up-the-tree), make changes to the file two_sum.py:
+Using the knowledge from [before](#working-up-the-tree), make changes to the file two_sum.py and afterward add, commit, and push these changes:
 
 ```python
+/COMP390/git-test/two_sum.py
+
 def three_sum(arr, target):
     left = 0
     right = 0
@@ -249,12 +255,139 @@ def three_sum(arr, target):
     # Not sure what to do just yet...
 ```
 
+    git add .
+    git commit -m "Starting point for three_sum" -m "Issues with implementation."
+    git push origin three_sum
+
+> NOTE: git push {remote_name} {branch_name}, so  push to three_sum instead of main, by changing the last line. To push to a different repository, you would change the {remote_name} from origin.
+
+### Upon doing so, you should notice if you reload your GitHub repository...
+![Git Remote Branch](images/git-remote-branch.png)
+
+> Don't worry about the "Compare & Pull Request" button just yet...
+
+### Our new code has been put onto a different branch as well! To access this branch:
+1. Select the branch dropdown and select the *three-sum* branch.
+![Git Branch Drop Down](images/git-remote-branches.png) 
+
+You should see your new changes to this branch! 
+
+Before we move unto merging and rebasing:
+
+Let's add a commit to two-sum to simulate two different "branches" or workflows currently going on.
+
+Using your new-learned knowledge, switch back to the main branch, make any commit to two_sum.py, and push this commit to the main branch on Github.
+
+I'll be adding these lines below our original two_sum.py in main (feel free to copy):
+
+```python
+def run_tests():
+    # two_sum.py test cases
+    run_test([2,3,5,7,8,12], 15, [3,4])
+    run_test([], 0, [-1,-1])
+    run_test([-1,-1], -2, [0,1])
+    run_test([1], 1, [-1,-1])
+    run_test([3,100,2,4,5,9], 110, [-1,-1])
+
+def run_test(arr, target, correct_ans):
+    test_answer = two_sum(arr, target)
+    if test_answer != correct_ans:
+        print(f"Two sum function given array {arr}, target {target} returned {test_answer}, but expected {correct_ans}")
+    else:
+        print(f"Two sum function given array {arr}, target {target} was correct, returned {test_answer}.")
+
+def main():
+    run_tests()
+
+if __name__ == "__main__":
+    main()
+```
+    git add .
+    git commit -m "Modified 2Sum.py" -m "Added testcases to determine it works for edge and normal cases."
+    git push origin main
+
+
+I'll be just finishing three_sum() in the three_sum branch:
+```python
+
+def three_sum(arr, target):
+    arr.sort()
+    ans = []
+    for i in range(len(arr) - 2):
+        if i > 0 and arr[i] == arr[i-1]:
+            continue
+        left = i + 1
+        right = len(arr) - 1
+        curr_target = target - arr[i]
+        while left < right:
+            if arr[left] == arr[left + 1]:
+                left += 1
+            elif arr[right] == arr[right - 1]:
+                right -= 1
+            curr_sum = arr[left] + arr[right]
+
+            if curr_sum < curr_target:
+                left += 1
+            elif curr_sum > curr_target:
+                right -= 1
+            else:
+                ans += [arr[i], arr[left], arr[right]]
+                left += 1
+    return ans
+
+def main():
+    print(three_sum([3,3,3,5,7,8,12], 15)) # Prints [3,5,7]
+```
+
+    git add .
+    git commit -m "Finished 3Sum Function" -m "Added functionality and removal of duplicates."
+    git push origin three_sum
+
 
 # Merging/Rebasing
 
+## Commit Graph
+
+### Our commits can be thought of as nodes/snapshots/milestones which hold data like:
+* a 40 alphanumeric character string as a hash
+* author and date committed 
+* commit title and description
+* snapshots of the files' current states
+
+### Each branch has a HEAD node, which is the current commit you're working tree is in.
+- The last commit you've made.  
+
+### So, for some context, our current project looks like:
+
+![Current Commit Graph](images/git-commit-graph.png)
+
+> NOTE: to see all of the commits in your current branch and more information, use `git log`
+
+# Merging/Rebasing
+
+## Let's get started with merging our two branches: `main` and `three_sum`.
+
+To merge them together, switch to the main branch and execute:
+
+    git checkout main  (if not in main branch)
+    git merge three_sum
+
+## You should notice something interesting pop up...
+
+    lchris@Christophers-MacBook-Pro git-test % git merge three_sum
+    Auto-merging two_sum.py
+    CONFLICT (content): Merge conflict in two_sum.py
+    Automatic merge failed; fix conflicts and then commit the result.
+
+## Fixing Merge Conflicts!
+
+## Afterward, commit your changes and push them!
+
+## Let's now do the other: rebasing our two branches: `main` and `three_sum`.
 
 
 # References
 Special thanks to these videos/articles
 for contributing the knowledge to make this project possible:
 * [GitKraken](https://www.gitkraken.com/learn/git/tutorials/what-is-a-git-repository)
+* [Atlassian: Merging-Vs-Rebasing](https://www.atlassian.com/git/tutorials/merging-vs-rebasing)
