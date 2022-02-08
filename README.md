@@ -15,6 +15,7 @@
     * [Creating the Online Github Repository](#creating-the-online-github-repository)
     * [Linking Local Repository With Github Repository](#linking-local-repository-with-github-repository)
     * [Pushing Code To GitHub](#now-lets-push-our-code)
+    * [Stashing For Later](#stashing-for-later)
 3. [Branching](#branching)
     * [Commit Graph](#commit-graph-1)
     * [Switching To A New Branch](#commit-graph-1)
@@ -38,7 +39,7 @@ Note that the folder stores the *history* of changes you made as well, by what i
 It's stored in the same project folder, alongside any other files. 
 You won't see it since it's stored as a hidden folder, but if you're curious:
 
-<img name="image" src="images/git-folder.png" width = 300/>
+<img name="image" src="images/introduction/git-folder.png" width = 300/>
 
 ## Git's "Assembly Line"
 
@@ -49,7 +50,6 @@ You won't see it since it's stored as a hidden folder, but if you're curious:
         * Maybe a feature you're still fixing a bug on, or a file you don't want to be seen by the public.
 * __Staging Area__
     * Control center: add what you *want* to commit (i.e. not change at the moment anymore), keep what you don't in the working tree.
-        * 
 * __Local Repository__
     * Local storage: all the code currently on your computer you're ready to publish, whether or not it matches with the online repository.
 * __Remote Github Repository__
@@ -58,6 +58,12 @@ You won't see it since it's stored as a hidden folder, but if you're curious:
 ### Code will flow from the working tree to the remote github repository.
 
 # Getting Started
+
+## Before we begin, you should have:
+* A computer
+* Some sort of text editor (VSCode, Atom, etc.)
+* Some knowledge of the terminal and filesystem (How to open it, move around directories...)
+
 ### To begin, there are mainly 2 ways to initalize or start a Git repository.
 
 1. (__*Recommended*__) Creating a Github repository on your Github account, and cloning it onto your local machine. 
@@ -121,8 +127,8 @@ we do the following:
 
 Ex: ```git add two_sum.py```
 
-With these commands, our code has now been moved from __Working Tree__ &#8594; __Staging Area__.
- 
+With these commands, our code has now been moved from __Working Tree__ &#8594; __Staging Area__
+
 ## The Staging Area
 
 So, your code is in the staging area now. You have two options:
@@ -173,11 +179,11 @@ or anywhere on Github.
     * This page should be a quick set-up guide, providing some steps to pushing code to the Git repo.
 7) Copy the link to the Github repository's Git Repository by clicking the icon shown below in the quick set-up guide.
 
-![Git Copy Link](images/git-copy-link.png)
+![Git Copy Link](images/getting-started/git-copy-link.png)
 
 <h3 align="center">Here's a quick GIF showcasing everything:</h3>
 
-![Git Repo GIF](images/git-create-repo.gif)
+![Git Repo GIF](images/getting-started/git-create-repo.gif)
 
 Great! All is left is to link the online Github repository with your current local repository on your computer.
 
@@ -190,7 +196,7 @@ To link our local repository with the current online Github repository we just c
 
 Upon doing so, if you type in `git remote -v`, you should get:
 
-<img name="image" src="images/git-origin.png" width = 400/>
+<img name="image" src="images/getting-started/git-origin.png" width = 400/>
 
 ## Now, let's push our code!
 
@@ -200,9 +206,68 @@ To finally push our code from our local repository to the Github repository, do 
 
 ### Upon reloading the quick setup page we were just at, the page should now contain the files you added:
 
-![Git Push](images/git-push.png)
+![Git Push](images/getting-started/git-push.png)
 
 Congrats! We've now created our own GitHub repository!
+
+## Stashing For Later
+
+In reference to the [Working Tree](#working-up-the-tree), what if you're not be ready to set your code in stone? A great scenario [Git](https://git-scm.com/docs/git-stash) that portrays this is:
+> "...[Say] you are in the middle of something, your boss comes in and demands that you fix something immediately..."
+
+Instead of having to commit to store your progress away in another branch: we have __git stash__.
+
+## Let's simulate this:
+
+Make a new file `bfs.py` and begin doing some "work" on it...
+
+```python
+COMP390/git-test/bfs.py
+
+def bfs(root):
+    queue = []
+    while len(queue) > 0:
+        pass
+    
+```
+
+### Uh oh... boss wants you to add testcases for the new two_sum function.
+It's just as simple as:
+
+    git stash -u
+
+> NOTE: the '-u' is to signify untracked files (since we've created a new file).
+
+### You should see the file disappear.
+
+[Git Stash Before](images/getting-started/git-stash-before.png)
+
+Let's do what our boss asked by going back to *two_sum.py* and adding:
+```python
+
+def main():
+    print(two_sum([3,5,9,0,-1,-5], 4)) # Returns [1, 4]
+    print(two_sum([], 0)) # Returns [-1,-1]
+
+if __name__ == "__main__":
+    main()
+
+```
+
+### Using the commands for committing and pushing to do our emergency fix:
+
+    git add .
+    git commit -m "Testcases for two_sum.py" -m "Added new testcases to test the two_sum function to make sure it works properly."
+    git push origin main
+
+### Now, after we do our emergency work, we can simply:
+
+    git stash pop
+
+### You should see your file 'bfs.py' reappear with the same changes we made! 
+
+[Git Stash After](images/getting-started/git-stash-after.png)
+
 
 
 > Note: The commands shown below will make more sense, given the knowledge of [Git's 4 data stores](#gits-assembly-line).
@@ -241,6 +306,8 @@ Ex: `git checkout -b three_sum`
 
     Switched to a new branch 'three_sum'
 
+> NOTE: there are other commands such as git branch {new_branch_name}, but this command requires you to move to the branch using checkout or switch anyways. So, use the above command as a shortcut.
+
 ### Now, we're in a new branch! Note that the adding and committing are all the same.
 
 Using the knowledge from [before](#working-up-the-tree), make changes to the file two_sum.py and afterward add, commit, and push these changes:
@@ -262,13 +329,13 @@ def three_sum(arr, target):
 > NOTE: git push {remote_name} {branch_name}, so  push to three_sum instead of main, by changing the last line. To push to a different repository, you would change the {remote_name} from origin.
 
 ### Upon doing so, you should notice if you reload your GitHub repository...
-![Git Remote Branch](images/git-remote-branch.png)
+![Git Remote Branch](images/branching/git-remote-branch.png)
 
 > Don't worry about the "Compare & Pull Request" button just yet...
 
 ### Our new code has been put onto a different branch as well! To access this branch:
 1. Select the branch dropdown and select the *three-sum* branch.
-![Git Branch Drop Down](images/git-remote-branches.png) 
+![Git Branch Drop Down](images/branching/git-remote-branches.png) 
 
 You should see your new changes to this branch! 
 
@@ -276,7 +343,7 @@ Before we move unto merging and rebasing:
 
 Let's add a commit to two-sum to simulate two different "branches" or workflows currently going on.
 
-Using your new-learned knowledge, switch back to the main branch, make any commit to two_sum.py, and push this commit to the main branch on Github.
+Using your new-learned knowledge, switch back to the main branch via the command `git checkout main`, make any commit to two_sum.py, and push this commit to the main branch on Github.
 
 I'll be adding these lines below our original two_sum.py in main (feel free to copy):
 
@@ -307,7 +374,7 @@ if __name__ == "__main__":
     git push origin main
 
 
-I'll be just finishing three_sum() in the three_sum branch:
+I'll be just finishing three_sum() in the three_sum branch (make sure to do `git checkout three_sum`):
 ```python
 
 def three_sum(arr, target):
@@ -359,7 +426,7 @@ def main():
 
 ### So, for some context, our current project looks like:
 
-![Current Commit Graph](images/git-commit-graph.png)
+![Current Commit Graph](images/merging-rebasing/git-commit-graph.png)
 
 > NOTE: to see all of the commits in your current branch and more information, use `git log`
 
@@ -381,9 +448,28 @@ To merge them together, switch to the main branch and execute:
 
 ## Fixing Merge Conflicts!
 
-## Afterward, commit your changes and push them!
+### There are two options:
+* __*(Recommended)*__ If you have an editor/GUI like Atom, Visual Studio Code, Github Desktop, or Gitkraken, you can simply go into the file and make the changes you want by selecting any of the options shown here:
+![Git Merge Conflict VSCode](images/merging-rebasing/git-merge-conflict.png)
+    * For this tutorial, we can simply choose this option and go with '__Accept Both Changes__'.
+
+> NOTE: After accepting both changes, we can clean up and simply combine the two main methods yourself, by putting the print statement `print(three_sum([3,3,3,5,7,8,12], 15)) # Prints [3,5,7]` below the `run_tests()` function. You don't have to, but it can make the merged code nicer.
+
+* If you don't have one of these editors, you can use Vim or a command line editor to view the changes, just note it's much more tricky.
+
+## After resolving the conflict, it's at simple as committing and pushing.
+
+    git add .
+    git commit -m "Merged main and three_sum" -m "New feature: 3sum, allows the user to find three numbers in the array which add up to the target."
+    git push origin main
+
 
 ## Let's now do the other: rebasing our two branches: `main` and `three_sum`.
+
+
+
+
+
 
 
 # References
@@ -391,3 +477,5 @@ Special thanks to these videos/articles
 for contributing the knowledge to make this project possible:
 * [GitKraken](https://www.gitkraken.com/learn/git/tutorials/what-is-a-git-repository)
 * [Atlassian: Merging-Vs-Rebasing](https://www.atlassian.com/git/tutorials/merging-vs-rebasing)
+* [Medium: Rebase vs Merge](https://medium.datadriveninvestor.com/git-rebase-vs-merge-cc5199edd77c)
+* [Git: Stashing](https://git-scm.com/docs/git-stash)
