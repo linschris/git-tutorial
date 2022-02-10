@@ -7,6 +7,7 @@
 1. [Introduction](#introduction)
     * [What is a Git Repository?](#what-is-a-git-repository)
     * [Git's "Assembly Line"](#gits-assembly-line)
+    * [Commit Graph](#commit-graph-1)
 2. [Getting Started](#getting-started)
     * [Setting Up The Git Repository](#setting-up-the-git-repository)
     * [Working Up The Tree](#working-up-the-tree)
@@ -17,16 +18,15 @@
     * [Pushing Code To GitHub](#now-lets-push-our-code)
     * [Stashing For Later](#stashing-for-later)
 3. [Branching](#branching)
-    * [Commit Graph](#commit-graph-1)
-    * [Switching To A New Branch](#commit-graph-1)
-4. [Merging/Rebasing](#mergingrebasing)
+    * [Switching To A New Branch](#switching-to-a-new-branch)
+4. [Merging](#merging)
     * [Fixing Merge Conflicts](#fixing-merge-conflicts)
 5. [References](#references)
 
 
 # Introduction
 
-Before we get started, having a bit of knowledge of what a Git repository is and the "assembly line" of the 4 possible areas where you code could currently be (from Git's perspective) can be quite helpful before you start this tutorial.
+Before we get started, having a bit of knowledge of what a Git repository is, and the 4 possible areas where you code could be (from Git's perspective) can be quite helpful before you start this tutorial.
 
 ## What is a Git repository?
 
@@ -46,16 +46,43 @@ You won't see it since it's stored as a hidden folder, but if you're curious:
 ### The way I think about it is, your code can be in one of 4 stages:
 
 * __Working Tree__
-    * Your home base: files that have been added, changed, etc, but that aren't ready to be added to the codebase just yet.
-        * Maybe a feature you're still fixing a bug on, or a file you don't want to be seen by the public.
+    * Your home base: files or changes on your computer that have been modified or added, but that have not been logged/tracked by Git yet.
+        * Maybe a feature you're still fixing a bug on, or a new file you're adding to the project.
 * __Staging Area__
-    * Control center: add what you *want* to commit (i.e. not change at the moment anymore), keep what you don't in the working tree.
+    * Control center: the staging area holds what you *want* to commit (or want to log/save in your project's history), while keeping what you don't want saved in the working tree.
 * __Local Repository__
-    * Local storage: all the code currently on your computer you're ready to publish, whether or not it matches with the online repository.
+    * Local storage: all the code currently on your computer that has been committed or logged by Git within the project's .git folder, whether or not it matches with the online repository.
 * __Remote Github Repository__
-    * Your "production", where the code is now open to the world or whatever team you're working on.
+    * Remote storage: files on a different computer, where it's open to those who can see your Github Repository, instead of being only on your current computer.
+    * Great for collaboration or for saving your progress (without the worry of losing your local .repository's git folder).
 
-### Code will flow from the working tree to the remote github repository.
+### Code will flow from the working tree to the remote GitHub repository.
+
+## Commit Graph
+
+While not neccessary for this tutorial, but a great way of understanding commits and branches is through what is known as the *commit graph*.
+
+Your project's history can be thought of as a long chain of commits or "snapshots" of your code as it changes over time, or in a more sophicated way, it can be thought of as a directed acyclic graph of commits(DAG).
+
+Here's a quick example of a simple commit-graph:
+![Simple Commit Graph](images/branching/simple-commit-graph.png)
+
+Read left to right.
+Each letter can thought of as a node, which each node being a commit we make to a branch within repository.
+
+In this example, we can see that we have a "main" history going from A->B->C->D (such as the production history with updates A,B,C,D). But, on the side, we see E -> F -> G as a "side" history or branch, which contains a history about the feature begin implemented over time after the "B" update. 
+
+* Each of these commits will be represented in Git by a 40-character hexadecimal string!
+    * Called "hashes", are signatures establishing "The changes I made before this commit are correct" in terms of who made them, when they were made, and what changes were made.
+    * Each commit can have multiple children, where each new "break-off" child (E) is a new [branch](#branching) (don't worry if you don't know branches yet).
+
+To get a vertical, pretty version of this graph, use:
+
+    git log
+
+> NOTE: This shows the commits in the current working branch.
+> Other methods such as `git rev-list --remotes` will show all the commit hashes, but not in
+> a pretty way.
 
 # Getting Started
 
@@ -66,9 +93,10 @@ You won't see it since it's stored as a hidden folder, but if you're curious:
 
 ### To begin, there are mainly 2 ways to initalize or start a Git repository.
 
-1. (__*Recommended*__) Creating a Github repository on your Github account, and cloning it onto your local machine. 
-2. Initalizing a Git repository on your local machine, creating a Github repository, and setting the origin (or where you push the code) to be the Github repository's URL.
+1. (__*Recommended*__) Creating a Github repository on your Github account, and cloning it onto your local machine using `git clone {url}`. Afterward, you can add/commit files as usual.
+2. Initalizing a Git repository on your local machine, creating a Github repository, adding files, and setting the origin (or where you push the code) to be the Github repository's URL.
     * Given, this is a Git __Command Line__ Tutorial, my tutorial will cover this way.
+    * This method is better if you're already started progress on your project in your local machine.
 
 ## Setting Up The Git Repository
 
@@ -93,12 +121,13 @@ This should return:
 
 and will initalize the Git repository inside of the folder, which can be seen as shown [above](#what-is-a-git-repository) and/or if you have [your hidden files](https://medium.com/pareture/show-git-and-other-default-hidden-folders-and-files-in-vs-code-57df151588ea) showing.
 
-Next, add any small files such as 
-* hi.txt, index.html, main.py 
+Next, add/create any files that pertain to your project inside the folder.
 
-and add content inside of them to get your project started and confirm that the later steps in this tutorial work properly.
+For this tutorial/project, we're going to make a file containing solutions to questions on [Leetcode](https://leetcode.com).
 
-Here's some free code to copy (and I'll be making a random file __two_sum.py__ to populate my git repo).
+To begin with, we'll be making a file called `two_sum.py` which can be a help with solving the problem [2Sum](https://leetcode.com/problems/two-sum/).
+
+Here's some free code to copy for this file __two_sum.py__.
 
 ```python
 /COMP390/git-test/two_sum.py
@@ -116,18 +145,18 @@ def two_sum(arr, target):
 
 ## Working Up The Tree
 
-Great, you should now have a repository with a folder containing some files with content inside of them.
+Great, you should now have a repository with a folder containing at least one file with content inside of it.
 
 Now, our code is currently in stage 1, in the __working tree__.
 
-To say to Git 'our code is ready to be set in stone (Github's history that is)',
+To say to Git 'our code is ready to be set in stone (Github's history that is) or staged',
 we do the following:
 
 ```git add .``` OR ```git add {file}```
 
 Ex: ```git add two_sum.py```
 
-With these commands, our code has now been moved from __Working Tree__ &#8594; __Staging Area__
+With these commands, our file has now been moved from __Working Tree__ &#8594; __Staging Area__
 
 ## The Staging Area
 
@@ -140,31 +169,25 @@ So, your code is in the staging area now. You have two options:
         - Ex: ```git commit -m "Added twosum.py" -m "Added a file which can compute the indices of an integer array, where the integers located at this indices adds up to a target value."```
 
 - If you __don't like__ how it is so far, you can *restore* it from the staging area by the following command.
-    -   ```git restore --staged```
+    - ```git restore --staged```
 
 To continue onwards, please commit whatever files you've currently added.
 
 Upon commiting, you should see a similar response:
 
-<img name="image" src="images/git-commit.png" width = 400/>
+<img name="image" src="images/getting-started/git-commit.png" width = 400/>
 
 By commiting, our code has now been moved from the __Staging Area__ &#8594; __Local Repository__.
-
 
 ## The Local Repository
 
 We're almost there! 
 
-It's set in stone (or history) on *our local machine*, but not on Github, or where it could be accessed, pulled, or downloaded by someone else.
+It's set in stone (or history) on *our local machine* for our local Git repository, but not on Github, or where it could be accessed, pulled, or downloaded by someone else.
 
 Now, we need to set up a repository on Github for use. Navigate to [Github](github.com) and create an account if you don't already have one.
 
-For the next step, remember your username or navigate to your user profile.
-
 ## Creating the Online Github Repository
-
-Now, navigate to the your user profile via the link `github.com/{your-username}`
-or anywhere on Github.
 
 ### To create a GitHub repository, do the following:
 1) Go to the '+' button on the top right hand corner
@@ -194,6 +217,10 @@ To link our local repository with the current online Github repository we just c
     git remote add origin {copied_git_link}
     git branch -M main
 
+The first command links our .git and project folder with the remote repository's git and project folder.
+
+The second command creates a branch called main (don't worry about this yet).
+
 Upon doing so, if you type in `git remote -v`, you should get:
 
 <img name="image" src="images/getting-started/git-origin.png" width = 400/>
@@ -204,18 +231,20 @@ To finally push our code from our local repository to the Github repository, do 
 
     git push -u origin main
 
+> NOTE: This is only for the first time around, afterward you can omit the `-u`.
+
 ### Upon reloading the quick setup page we were just at, the page should now contain the files you added:
 
 ![Git Push](images/getting-started/git-push.png)
 
-Congrats! We've now created our own GitHub repository!
+Congrats! We've now created and linked our own GitHub repository!
 
 ## Stashing For Later
 
-In reference to the [Working Tree](#working-up-the-tree), what if you're not be ready to set your code in stone? A great scenario [Git](https://git-scm.com/docs/git-stash) that portrays this is:
+In reference to the [Working Tree](#working-up-the-tree), what if you're not be ready to stage your code just yet? A great scenario [Git](https://git-scm.com/docs/git-stash) portrays is:
 > "...[Say] you are in the middle of something, your boss comes in and demands that you fix something immediately..."
 
-Instead of having to commit to store your progress away in another branch: we have __git stash__.
+Instead of having to commit to store your progress away: we have __git stash__.
 
 ## Let's simulate this:
 
@@ -236,11 +265,12 @@ It's just as simple as:
 
     git stash -u
 
-> NOTE: the '-u' is to signify untracked files (since we've created a new file).
+> NOTE: the '-u' is to signify untracked/new files (since we've created a new file).
+> For modifications to files only, you can omit the -u.
 
 ### You should see the file disappear.
 
-[Git Stash Before](images/getting-started/git-stash-before.png)
+![Git Stash Before](images/getting-started/git-stash-before.png)
 
 Let's do what our boss asked by going back to *two_sum.py* and adding:
 ```python
@@ -266,15 +296,18 @@ if __name__ == "__main__":
 
 ### You should see your file 'bfs.py' reappear with the same changes we made! 
 
-[Git Stash After](images/getting-started/git-stash-after.png)
+![Git Stash After](images/getting-started/git-stash-after.png)
 
+### You can continue to work on bfs.py and commit/push as necessary.
 
+## We've done it! Here's a little visual of what we've learned so far:
 
-> Note: The commands shown below will make more sense, given the knowledge of [Git's 4 data stores](#gits-assembly-line).
+<img name="image" src="images/getting-started/git_command_graph.png" width = 400/>
+
 
 # Branching
 
-### Suppose you had a friend working on the same project `git-test` as you, but he's still working on implementing a new feature `three_sum.py`.
+### Suppose you had a friend working on the same project `git-test` as you, but he's still working on implementing a new solution to 3Sum in the same file.
 
 ```python
     def three_sum(arr, target):
@@ -284,16 +317,11 @@ if __name__ == "__main__":
 
 ```
 
-He still wants to save his progress, but he doesn't want to push his code and ruin any code you've curated.
+They still wants to save their progress, but they doesn't want to commit his code and ruin any code that you've curated until they feel it's ready to be displayed.
 
-While yes he could just save everything on his local machine, what if he wants to work on this feature from a different computer somewhere else?
+Branching serves to act as a way to seperate code and files from each other when necessary, acting as almost like a "seperate timeline".
 
-This is the (or my inital) idea behind branching...
-
-## Commit Graph
-
-
-
+This stops your project's code from becoming a mess of different work-in-progress features, and instead promotes clean, independent "lines of development" that may or may not merge.
 
 ## Switching To A New Branch
 
@@ -310,7 +338,7 @@ Ex: `git checkout -b three_sum`
 
 ### Now, we're in a new branch! Note that the adding and committing are all the same.
 
-Using the knowledge from [before](#working-up-the-tree), make changes to the file two_sum.py and afterward add, commit, and push these changes:
+Using the knowledge from [before](#working-up-the-tree), make changes to the file two_sum.py and afterward add, commit, and push these changes to the new three_sum branch:
 
 ```python
 /COMP390/git-test/two_sum.py
@@ -324,7 +352,7 @@ def three_sum(arr, target):
 
     git add .
     git commit -m "Starting point for three_sum" -m "Issues with implementation."
-    git push origin three_sum
+    git push origin three_sum -- NOTE: the branch name is changed here to signify a different branch.
 
 > NOTE: git push {remote_name} {branch_name}, so  push to three_sum instead of main, by changing the last line. To push to a different repository, you would change the {remote_name} from origin.
 
@@ -411,24 +439,16 @@ def main():
     git push origin three_sum
 
 
-# Merging/Rebasing
+# Merging
 
-## Commit Graph
-
-### Our commits can be thought of as nodes/snapshots/milestones which hold data like:
-* a 40 alphanumeric character string as a hash
-* author and date committed 
-* commit title and description
-* snapshots of the files' current states
+## Current Commit Graph
 
 ### Each branch has a HEAD node, which is the current commit you're working tree is in.
 - The last commit you've made.  
 
-### So, for some context, our current project looks like:
+### So, for some context with our new knowledge of commit graphs, our current project looks like:
 
 ![Current Commit Graph](images/merging-rebasing/git-commit-graph.png)
-
-> NOTE: to see all of the commits in your current branch and more information, use `git log`
 
 # Merging/Rebasing
 
@@ -452,6 +472,7 @@ To merge them together, switch to the main branch and execute:
 * __*(Recommended)*__ If you have an editor/GUI like Atom, Visual Studio Code, Github Desktop, or Gitkraken, you can simply go into the file and make the changes you want by selecting any of the options shown here:
 ![Git Merge Conflict VSCode](images/merging-rebasing/git-merge-conflict.png)
     * For this tutorial, we can simply choose this option and go with '__Accept Both Changes__'.
+    * Most editors should be able to do this, as Git shows the differences at which lines.
 
 > NOTE: After accepting both changes, we can clean up and simply combine the two main methods yourself, by putting the print statement `print(three_sum([3,3,3,5,7,8,12], 15)) # Prints [3,5,7]` below the `run_tests()` function. You don't have to, but it can make the merged code nicer.
 
@@ -463,19 +484,19 @@ To merge them together, switch to the main branch and execute:
     git commit -m "Merged main and three_sum" -m "New feature: 3sum, allows the user to find three numbers in the array which add up to the target."
     git push origin main
 
+## Your GitHub Repository Should Now Look Like...
 
-## Let's now do the other: rebasing our two branches: `main` and `three_sum`.
+    TODO
 
-
-
-
-
-
+# And... That's It!
+## You should have all the knowledge necessary to create your own Git project and get started.
+* Feel free to go to back to the table of contents if you need a specific piece of knowledge!
 
 # References
-Special thanks to these videos/articles
+Special thanks to these videos, articles, and people
 for contributing the knowledge to make this project possible:
 * [GitKraken](https://www.gitkraken.com/learn/git/tutorials/what-is-a-git-repository)
 * [Atlassian: Merging-Vs-Rebasing](https://www.atlassian.com/git/tutorials/merging-vs-rebasing)
 * [Medium: Rebase vs Merge](https://medium.datadriveninvestor.com/git-rebase-vs-merge-cc5199edd77c)
 * [Git: Stashing](https://git-scm.com/docs/git-stash)
+* [Justin Li](https://github.com/justinnhli)
