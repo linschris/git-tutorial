@@ -18,8 +18,10 @@
     * [Pushing Code To GitHub](#now-lets-push-our-code)
     * [Stashing For Later](#stashing-for-later)
 3. [Branching](#branching)
-    * [Switching To A New Branch](#switching-to-a-new-branch)
+    * [Creating and Switching To A New Branch](#switching-to-a-new-branch)
 4. [Merging](#merging)
+    * [Current Commit Graph](#current-commit-graph)
+    * [Merging Two Branches Together](#lets-get-started-with-merging-our-two-branches-main-and-threesum)
     * [Fixing Merge Conflicts](#fixing-merge-conflicts)
 5. [References](#references)
 
@@ -27,6 +29,8 @@
 # Introduction
 
 Before we get started, having a bit of knowledge of what a Git repository is, and the 4 possible areas where you code could be (from Git's perspective) can be quite helpful before you start this tutorial.
+
+If you have this knowledge ready to go already, feel free to [get started](#getting-started).
 
 ## What is a Git repository?
 
@@ -41,7 +45,7 @@ You won't see it since it's stored as a __hidden__ folder, but if you're curious
 
 <img name="image" src="images/introduction/git-folder.png" width = 400/>
 
-### In order to track and store your code and progress, you need to take advantage of...
+### In order to track and store your code and modifications, you need to take advantage of...
 
 ## Git's "Assembly Line"
 
@@ -59,7 +63,7 @@ You won't see it since it's stored as a __hidden__ folder, but if you're curious
     * Remote storage: your project files on a different computer (online), where it's open to those who can see your Github Repository, instead of being only on your current computer.
         * Great for collaboration or for saving your progress (without the worry of losing your local .repository's git folder).
 
-### Code will flow from the working tree to the remote GitHub repository through git commands after this Introduction.
+### Code will flow from the working tree to the remote GitHub repository through git commands after this introduction.
 
 ## Commit Graph
 
@@ -73,7 +77,7 @@ Here's a quick example of a simple commit graph:
 It's read left to right.
 Each letter can thought of as a node, with each node being a commit we make to a branch within the Git repository.
 
-In this example, we can see that we have a "main" history going from A->B->C->D (such as the production history with updates/commits A,B,C,D). But, on the side, we see E -> F -> G as a "side" history or branch, which contains a history about the feature being implemented over time after the "B" update/commit. 
+In this example, we can see that we have a "main" timeline going from A->B->C->D (such as the production history with updates/commits A,B,C,D). But, on the side, we see E -> F -> G as a "side" history or branch, which contains a history (or alternate timeline) about the feature being implemented over time after the "B" update/commit. 
 
 * Each of these commits will be represented in Git by a 40-character hexadecimal string!
     * Called "hashes", are signatures establishing "The changes I made before this commit are correct" in terms of who made them, when they were made, and what changes were made.
@@ -95,7 +99,7 @@ To get a vertical, pretty version of this graph, use:
 ## Before we begin, you should have:
 * A computer
 * Some sort of text editor (VSCode, Atom, etc.)
-* Some basic knowledge of the terminal and filesystem (How to open it, move around directories...)
+* *(Optional, but useful)* Some basic knowledge of the terminal and filesystem (How to open it, move around directories...)
 
 ### To begin, there are mainly 2 ways to initalize or start a Git repository.
 
@@ -133,7 +137,7 @@ For this tutorial/project, we're going to make a file containing solutions to qu
 
 To begin with, we'll be making a file called `two_sum.py`, which will help with problems like [2Sum](https://leetcode.com/problems/two-sum/).
 
-Here's some free code to copy for this file two_sum.py__.
+Here's some free code to copy for this file __two_sum.py__.
 
 ```python
 /COMP390/git-test/two_sum.py
@@ -155,7 +159,7 @@ Great, you should now have a repository with a folder containing at least one fi
 
 Now, our code is currently in stage 1, in the __working tree__.
 
-To say to Git 'our code is ready to be set in stone (our project's history that is) or staged',
+To say to Git "our code is ready to be set in stone (our project's history that is) or staged",
 we do the following (`.` means all modifications, new files, but no deletions):
 
 ```git add .``` OR ```git add {file}```
@@ -217,7 +221,7 @@ Now, we need to set up a repository on Github for use. Navigate to [Github](gith
 
 ![Git Repo GIF](images/getting-started/git-create-repo.gif)
 
-Great! All is left is to link the online Github repository with your current local repository on your computer.
+<h3 align="center">Great! All that's left is to link the online Github repository with your current local repository on your computer.</h3>
 
 ## Linking Local Repository With Github Repository
 
@@ -270,7 +274,7 @@ def bfs(root):
 ```
 
 ### Uh oh... boss wants you to add testcases for the new two_sum function.
-It's just as simple as:
+Don't worry! It's just as simple as stashing the file away:
 
     git stash -u
 
@@ -379,7 +383,7 @@ def three_sum(arr, target):
 
 ![Git ThreeSum Branch](images/branching/three_sum_branch.png)
 
-### Before we move unto merging and rebasing:
+### Before we move unto merging:
 
 #### Let's add a commit in the main and three_sum branch to simulate two different "branches" or workflows currently going on.
 
@@ -450,8 +454,6 @@ def three_sum(arr, target):
 ### So, for some context with our knowledge of commit graphs, our current project looks like:
 
 ![Current Commit Graph](images/merging-rebasing/git-commit-graph.png)
-
-# Merging/Rebasing
 
 ## Let's get started with merging our two branches: `main` and `three_sum`.
 
