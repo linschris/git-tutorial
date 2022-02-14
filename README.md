@@ -21,7 +21,7 @@
     * [Creating and Switching To A New Branch](#switching-to-a-new-branch)
 4. [Merging](#merging)
     * [Current Commit Graph](#current-commit-graph)
-    * [Merging Two Branches Together](#lets-get-started-with-merging-our-two-branches-main-and-threesum)
+    * [Merging Two Branches Together](#lets-get-started-with-merging-our-two-branches-main-and-three_sum)
     * [Fixing Merge Conflicts](#fixing-merge-conflicts)
 5. [References](#references)
 
